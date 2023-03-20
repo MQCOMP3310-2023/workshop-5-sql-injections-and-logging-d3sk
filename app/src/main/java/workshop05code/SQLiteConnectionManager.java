@@ -128,9 +128,11 @@ public class SQLiteConnectionManager {
     public void addValidWord(int id, String word) {
 
         String sql = "INSERT INTO validWords(id,word) VALUES('" + id + "','" + word + "')";
-
+        String sql1 = "INSERT INTO validwords(id,word) VALUES(?, ?);";
         try (Connection conn = DriverManager.getConnection(databaseURL);
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql1)) {
+                    pstmt.setInt(1, id);
+                    pstmt.setString(2, word);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -146,10 +148,10 @@ public class SQLiteConnectionManager {
      */
     public boolean isValidWord(String guess) {
         String sql = "SELECT count(id) as total FROM validWords WHERE word like'" + guess + "';";
-
+        String sql1 = "SELECT count(id) as total FROM validWords WHERe word like ?;";
         try (Connection conn = DriverManager.getConnection(databaseURL);
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+                PreparedStatement stmt = conn.prepareStatement(sql1)) {
+                stmt.setString(1, guess);
             ResultSet resultRows = stmt.executeQuery();
             if (resultRows.next()) {
                 int result = resultRows.getInt("total");
